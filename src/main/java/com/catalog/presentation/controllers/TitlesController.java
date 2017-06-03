@@ -78,18 +78,6 @@ public class TitlesController {
 	private MediaFolderService mediaFolderService;
 
 
-
-//	@Autowired
-//	private NotInsertedDAO notInsertedDAO;
-	
-	/*@Autowired
-	private FileManipulator fileManipulator;*/
-	
-//	@Autowired
-//	private CntByGenreDAO cntByGenre;
-//
-//	@Autowired
-//	private CntByTypeDAO cntByType;
 	@RequestMapping(value = "/titles")
 	private ModelAndView homepage(Principal principal)
 	{
