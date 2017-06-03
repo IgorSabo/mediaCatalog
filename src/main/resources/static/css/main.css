@@ -1,0 +1,229 @@
+
+        body
+        {
+            margin-top: 50px;
+            padding: 0;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            font-style: oblique;
+            //background-image: url("../images/dark side.jpg");
+        }
+
+
+
+
+        #container
+        {
+            width : 1100px;
+            margin-left: 20%;
+        }
+        .totalFoundDiv
+        {
+            text-decoration-style: solid;
+            text-align: right;
+        }
+        .browseTitle
+        {
+            width: 302px;
+            height: 203px;
+            border-right: 1px solid;
+            border-bottom: 1px solid;
+            border-radius: 10px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .rowsContainer
+        {
+           /* margin-left: 50px;*/
+            margin-top: 40px;
+            width: 1000px;
+        }
+
+        .noInsRowsContainer
+        {
+            /* margin-left: 50px;*/
+            margin-top: 40px;
+            width: 1000px;
+        }
+
+        .imageLink
+        {
+            width:110%;
+            height:110%;
+            padding-top: 3px;
+        }
+        .titleDiv
+        {
+            line-height: 110%;
+            text-align: left;
+            font-weight: bold;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+            word-wrap:break-word ;
+        }
+        .qualityDiv
+        {
+            float: left;
+            padding-top: 30px;
+        }
+        .genreDiv
+        {
+            text-align: left;
+            float: left;
+        }
+
+        .buttonStyle
+        {
+            line-height: 20px;
+            text-align: center;
+            padding-top: 0px;
+            border-color: black;
+        }
+        .buttonDiv
+        {
+            position: absolute;
+            bottom: 1px;
+            height: 60px;
+        }
+        .currentPage, .IdOFSelectedTitle, .genreName
+        {
+            visibility: hidden;
+                width: 30px;
+        }
+        #results
+        {
+            position: absolute;
+            z-index: 1;
+            display: block;
+            background-color: darkgray;
+        }
+        .imageContainer
+        {
+            height:320px;
+            width: 250px;
+        }
+        .titleName
+        {
+            line-height: 110%;
+            text-align: left;
+            font-weight: bold;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+            font-size: 30px;
+            text-align: center;
+        }
+        .imageLink
+        {
+            cursor: pointer;
+        }
+
+        .fetchImdb
+        {
+            float: left;
+        margin-left: 24%;
+        }
+        .textBoxStyle
+        {
+            width: 400px;
+        }
+        .btnGoToEdit
+        {
+            margin-right: 10px;
+        }
+
+        .btnOpen{
+            margin-right: 10px;
+        }
+
+        .btnPlay
+        {
+            margin-right: 10px;
+        }
+
+        .btnDelete
+        {
+            margin-right: 10px;
+        }
+        .clickForTooltip
+        {
+            width: 90%;
+            float: left;
+        }
+        .advancedSearchDiv
+        {
+            <!--visibility: hidden;
+                height: 1px; -->
+        }
+        .generalOptionsDiv{
+
+        }
+        .optionContainerDiv{
+            margin-top: 15px;
+            margin-left: 45px;
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 10px;
+            overflow: auto;
+        }
+        .folderPathEntry{
+            text-align: left;
+            font-weight: bold;
+        }
+        .pathContainerLabel{
+            padding:15px;
+        }
+        .pathContainerContent{
+            padding:15px;
+        }
+
+        .newFolderPath{
+            width:100%;
+        }
+
+        .duplicatesContainerContent{
+            padding:15px;
+            height:200px;
+            overflow-y: scroll;
+        }
+
+        .duplicateName{
+            cursor: pointer;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .duplicateLocation{
+            display: block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            word-break: break-all;
+            overflow: hidden;
+            width: 230px;
+            line-height: 25px;
+        }
+
+        .duplicateLocationContainer{
+            text-align: left;
+        }
+
+        .duplicateEntryInfo{
+            margin-top: 10px;
+        }
+
+        .selectedDuplicate{
+            background-color:darkgray;
+        }
+
+        .glyphicon-refresh-animate {
+            -animation: spin .7s infinite linear;
+            -webkit-animation: spin2 .7s infinite linear;
+        }
+
+        @-webkit-keyframes spin2 {
+            from { -webkit-transform: rotate(0deg);}
+            to { -webkit-transform: rotate(360deg);}
+        }
+
+        @keyframes spin {
+            from { transform: scale(1) rotate(0deg);}
+            to { transform: scale(1) rotate(360deg);}
+        }

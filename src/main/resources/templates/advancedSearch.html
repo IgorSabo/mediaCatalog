@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+<link
+	href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+	th:href="@{/webjars/bootstrap/3.3.4/css/bootstrap.min.css}"
+	rel="stylesheet" media="screen" />
+
+<script src="http://cdn.jsdelivr.net/webjars/jquery/2.1.4/jquery.min.js" th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+
+<!--<link href="../static/css/bootstrap-theme.css"	th:href="@{css/bootstrap-theme.css}" rel="stylesheet" media="screen" />
+<link href="../static/css/bootstrap.css" th:href="@{css/bootstrap.css}" rel="stylesheet" media="screen" />-->
+<link href="../static/css/main.css" th:href="@{css/main.css}" rel="stylesheet" media="screen" />
+<link href="../static/css/style.css" th:href="@{css/style.css}"	rel="stylesheet" media="screen" />
+
+<script type="text/javascript" src="../static/js/functions.js"	th:src="@{js/functions.js}"></script>
+<script type="text/javascript" src="../static/js/liveSearch.js"	th:src="@{js/liveSearch.js}"></script>
+<script type="text/javascript" src="../static/js/bootstrap.js"	th:src="@{js/bootstrap.js}"></script>
+<title>Catalog</title>
+<script type="text/javascript">
+            $(document).ready()
+            {
+                //vrati rezultate
+                getAllCountResults();
+            }
+            
+        </script>
+</head>
+<body>
+	<div id="container">
+
+		<br />
+		<br />
+		<br />
+
+		<div class="row">
+			<div class=" col-md-2 pull-left "></div>
+			<div class=" col-md-2 pull-left ">
+				<input type="button" value="Last added"
+					class=" btn btn-primary btn-default"
+					onclick="getAllTitles('recentlyAdded')"
+					style="margin-top: 15px; width: 150px"></input>
+			</div>
+			<div class=" col-md-2 pull-left ">
+				<input type="button" value="Synchronize"
+					class=" btn btn-primary btn-default"
+					onclick="synchonizationCalled()"
+					style="margin-top: 15px; width: 150px"></input>
+			</div>
+			<div class=" col-md-2 pull-left ">
+				<input type="button" value="Advanced search"
+					class=" btn btn-primary btn-default" onclick="openAdvancedSearch()"
+					style="margin-top: 15px; width: 150px"></input>
+			</div>
+			<div class=" col-md-4 pull-left ">
+				<h1 class="title">Enter title name:</h1>
+
+
+				<!-- Main Input -->
+				<input type="text" id="search" autocomplete="off"></input>
+
+				<!-- Show Results -->
+				<h4 id="results-text">
+					Showing results for: <b id="search-string">Array</b>
+				</h4>
+				<ul id="results"></ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class=" col-md-3 pull-left" style="margin-left: 20px; width: 150px; height: 600px; margin-top: 80px;">
+				<br />
+				<br /> <input type="button" value="Back"
+					class=" btn btn-primary btn-default"
+					style="width: 100%; text-decoration: none;"
+					onclick="javascript:location.href='/titles'"></input>
+			</div>
+			<div class=" col-md-9 pull-left outerDiv" style="height: 600px; margin-left: -8px">
+				<br />
+				<div class="row">
+					<div class="col-md-9 pull-right totalFoundDivQURAC" style="text-align: right;">
+
+						<input type="text" class="currentPage" value="0"></input> 
+						<input type="text" class="IdOFSelectedTitle" value="0"></input> 
+						<input type="text" class="genreName" value="notSelected"></input>
+						<button type="button"
+							class="btn btn-default btn-default buttonNext"
+							style="width: 99px; float: right" onclick="getNext()">
+							Next&nbsp;&nbsp;<span class="glyphicon glyphicon-forward"
+								aria-hidden="true"></span>
+						</button>
+
+						<button type="button"
+							class="btn btn-default btn-default buttonPrevious"
+							style="float: right;" onclick="getPrevious()">
+							<span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
+							Previous
+						</button>
+					</div>
+					<div class="col-md-3 pull-left titlesPerPageDiv"	style="text-align: left;">
+						Titles per page: <select id="perPage">
+							<option selected="selected">12</option>
+							<option>24</option>
+							<option>36</option>
+							<option>48</option>
+						</select>
+					</div>
+
+				</div>
+				<div class="row advancedSearchDiv">
+
+
+					<div class="row" style="margin-top: 40px; margin-left: 140px;">
+						<div class="col-md-3 pull-left selectType"></div>
+						<div class=" col-md-3 pull-left selectGenre"></div>
+						<div class=" col-md-3 pull-left selectYear"></div>
+					</div>
+					<div class="row" style="margin-top: 50px">
+						<div class=" col-md-3"></div>
+						<div class=" col-md-3 pull-left">
+							<input type="button" value="Search"	class=" btn btn-primary btn-success" style="width: 70%" onclick="advancedSearch()"></input>
+						</div>
+						<div class=" col-md-3">
+							<input type="button" value="Reset"	class=" btn btn-primary btn-danger" style="width: 70%"	onclick="clearAdvancedSearch()"></input>
+						</div>
+						<div class=" col-md-3"></div>
+					</div>
+				</div>
+				<br />
+				<!--results list -->
+				<div class="rowsContainer" th:replace="resultList :: resultsList"></div>
+			</div>
+
+			<!--show result info -->
+			<div th:replace="resultInfo :: resultInfo"></div>
+
+
+			<!--edit result info -->
+			<div th:replace="editTitle :: editResultInfo"  class="modalEditTitleInfoContainer"></div>
+
+
+			<!--Modal za edit not inserted odabranog rezultata -->
+			<div th:replace="editNoInsTitle :: editNoInsTitle"></div>
+
+
+			<!--Modal za synchronyze -->
+			<div class="modal fade" id="modalSync" tabindex="-1" role="dialog"
+				aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content" style="width: 600px; height: 400px">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="myModalLabel"></h4>
+						</div>
+						<div class="modal-body" style="height: 72%">
+							<br /> <span
+								class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+							Synchronization in progress... <br /> <br />
+
+							<div class="row">
+								<div class="col-md-6 pull-left synchMessage"
+									style="text-align: right;"></div>
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Title</title>
+</head>
+<body>
+<div  class="modalEditTitleInfoContainer" th:fragment="editResultInfo">
+    <div class="modal fade" id="modaEditInfo" th:if="${titleInfo != null}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px; height: 900px">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Edit</h4>
+                </div>
+                <div class="modal-body" style="height:84%">
+                    <br></br>
+                    <div class="row">
+                        <div class="col-md-6 pull-left newName" style="text-align: right;">
+                            <div class="row">
+                                <div class="col-md-6 pull-left " style="text-align: right;">
+                                    IMDB id:
+                                </div>
+                                <div class="col-md-6 pull-left" style="text-align: left;">
+                                    <input type="text" class="imdbID" style="width: 120px;"></input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pull-left" style="text-align: right;">
+                            <button type="button" class="btn btn-primary btn-default fetchImdb"
+                                    onclick="fetchFromIMDB()">Fetch from IMDB
+                            </button>
+                        </div>
+                        <br></br>
+                        <br></br>
+                        <br></br>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 pull-left imageContainer" style="text-align: right;"> <img class="imageLink" th:src="${titleInfo.picture!=null ? titleInfo.picture : 'http://www.cliparthut.com/clip-arts/420/red-question-mark-420663.jpg'}" /> </div>
+                        <div class="col-md-6 pull-left infoDiv" style="text-align: left;">
+                            <div class="row">
+                                <div class="col-md-12 pull-left titleName"
+                                     style="padding-left: 10px;"><input type="text" class="editName" th:value="${titleInfo.imdbTitle!=null ? titleInfo.imdbTitle : titleInfo.rawName}" style="width: 290px;" /></div>
+                                <br></br><br></br><br></br>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Year:</b>
+                                </div>
+                                <div class="col-md-6 pull-left titleYear" style="padding-left: 30px;"><input type="text" class="editYear" th:value="${titleInfo.year!=null ? titleInfo.year : 'Insert year...'}" /></div>
+                            </div>
+                            <div class="row" style="padding-top: 20px">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Quality:</b>
+                                </div>
+                                <div class="col-md-6 pull-left titleQuality"
+                                     style="padding-left: 30px;"><input type="text" class="editQuality" th:value="${titleInfo.quality!=null ? titleInfo.quality : 'Insert quality...'}" /></div>
+                            </div>
+                            <div class="row" style="padding-top: 20px">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Genre:</b>
+                                </div>
+                                <div class="col-md-6 pull-left titleGenre"
+                                     style="padding-left: 30px;"><input type="text" class="editGenre" th:value="${titleInfo.genre!=null ? titleInfo.genre : 'Insert genre...'}" /></div>
+                            </div>
+                            <div class="row" style="padding-top: 20px">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Type:</b>
+                                </div>
+                                <div class="col-md-6 pull-left titleType" style="padding-left: 30px;">
+                                    <select id="editType">
+                                        <option value='1' th:selected="${titleInfo.IDtype==1}">Movie</option>
+                                        <option value='2' th:selected="${titleInfo.IDtype==2}">Series</option>
+                                        <option value='4' th:selected="${titleInfo.IDtype==3}">Game</option>
+                                        <option value='3' th:selected="${titleInfo.IDtype==4}">Other</option>
+                                    </select></div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br></br>
+                    <br></br>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Image URL:</b></div>
+                        <div class="col-md-9 pull-left imgUrl"
+                             style="padding-left: 30px; text-align: left; word-wrap: break-word;"><input type="text" class="editImgUrl textBoxStyle" th:value="${titleInfo.picture!=null ? titleInfo.picture : 'Insert image url...'}" /></div>
+                    </div>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Location:</b></div>
+                        <div class="col-md-9 pull-left titleLocation"
+                             style="padding-left: 30px; text-align: left; word-wrap: break-word;"><input type="text" class="editLocation textBoxStyle" th:value="${titleInfo.location!=null ? titleInfo.location : null}" /></div>
+                    </div>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Plot:</b></div>
+                        <div class="col-md-9 pull-left titlePlot"
+                             style="padding-left: 30px; text-align: left; overflow-y: auto; height: 100px"><textarea cols="50" rows="5" class="editPlot textBoxStyle" th:text="${titleInfo.description!=null ? titleInfo.description : 'Insert plot...'}"></textarea></div>
+                    </div>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Cast:</b></div>
+                        <div class="col-md-9 pull-left titleCast"
+                             style="padding-left: 30px; text-align: left"><textarea cols="50" rows="5" class="editActors textBoxStyle" th:text="${titleInfo.actors!=null ? titleInfo.actors : 'Insert plot...'}"></textarea></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 pull-left" style="text-align: right;">
+                        </div>
+                        <div class="col-md-3 pull-left" style="text-align: left;">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <!--th:onclick="'editTitleInfo(' + ${titleInfo!=null ? titleInfo.IDfilm : null} +',false' + ')'" -->
+                    <span class="btnSave" style="float: left;margin-left: 78%;">
+                                    <button type="button" th:if="${titleInfo != null}" class="btn btn-primary" th:onclick="'saveChanges('+${titleInfo.genre!=null ? titleInfo.IDfilm + ',false'+')' : titleInfo.IDfilm + ',true'+')'}">Save</button></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

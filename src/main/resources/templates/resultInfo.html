@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="resultInfo" class="modalTitleInfoContainer">
+    <div class="modal fade" id="modaTitleInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px; height: 800px">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Info</h4>
+                </div>
+                <div class="modal-body" style="height:84%">
+                    <br></br>
+                    <div class="row">
+                        <div class="col-md-6 pull-left imageContainer" style="text-align: right;"><img
+                                class="imageLink" th:src="${titleInfo!=null ? titleInfo.picture : null}"/>
+                        </div>
+                        <div class="col-md-6 pull-left infoDiv" style="text-align: left;">
+                            <div class="row">
+                                <div class="col-md-12 pull-left titleName" style="padding-left: 10px;">
+                                    <b><span
+                                            th:text="${titleInfo!=null ? #strings.capitalize(titleInfo.imdbTitle) : null}">Title</span></b>
+                                </div>
+                                <br></br><br></br><br></br>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Year:</b>
+                                </div>
+                                <div th:text="${titleInfo!=null ? titleInfo.year : null}"
+                                     class="col-md-6 pull-left titleYear" style="padding-left: 30px;">Year
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 20px">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Quality:</b>
+                                </div>
+                                <div th:text="${titleInfo!=null ? titleInfo.quality : null}"
+                                     class="col-md-6 pull-left titleQuality" style="padding-left: 30px;">
+                                    Quality
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 20px">
+                                <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Genre:</b>
+                                </div>
+                                <div th:text="${titleInfo!=null ? titleInfo.genre : null}"
+                                     class="col-md-6 pull-left titleGenre" style="padding-left: 30px;">Genre
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br></br>
+                    <br></br>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Location:</b></div>
+                        <div th:text="${titleInfo!=null ? titleInfo.location : null}"
+                             class="col-md-9 pull-left titleLocation"
+                             style="padding-left: 30px; text-align: left; word-wrap: break-word;">Location
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Plot:</b></div>
+                        <div th:text="${titleInfo!=null ? titleInfo.description : null}"
+                             class="col-md-9 pull-left titlePlot"
+                             style="padding-left: 30px; text-align: left;overflow-y: auto;height: 100px">
+                            Plot
+                        </div>
+                    </div>
+                    <div class="row" style="padding-top: 20px">
+                        <div class="col-md-3 pull-left" style="padding-left: 30px;"><b>Cast:</b></div>
+                        <div th:text="${titleInfo!=null ? titleInfo.actors : null}"
+                             class="col-md-9 pull-left titleCast"
+                             style="padding-left: 30px; text-align: left">Cast
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 pull-left" style="text-align: right;">
+                        </div>
+                        <div class="col-md-3 pull-left" style="text-align: left;">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+
+                    <span class="btnOpen">
+                        <button type="button" value="Open" class="btn  btn-default"
+                               style="float:left"
+                               th:onclick="'openFolder(\'' + ${titleInfo!=null ? titleInfo.IDfilm : null} + '\')'">Open folder</button>
+                    </span>
+
+                    <span class="btnPlay">
+                            <button type="button" class="btn btn-default"  th:onclick="'play(\'' + ${titleInfo!=null ? titleInfo.IDfilm : null} + '\')'">
+                            <span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+                    </span>
+
+                    <span class="btnDelete"><button type="button" class="btn btn-danger"
+                                                    th:onclick="'deleteFromDatabase(false)'">Delete</button></span>
+                    <span class="btnGoToEdit"><button type="button" class="btn btn-warning"
+                                                      th:onclick="'editTitleInfo(' + ${titleInfo!=null ? titleInfo.IDfilm : null} +',false' + ')'">Edit</button></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

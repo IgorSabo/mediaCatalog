@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html   xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+</head>
+<body>
+<div th:fragment="duplicateInfo">
+    <div th:each="duplicate: ${duplicates}" class="row duplicateEntryInfo">
+
+        <div class="col-md-9 duplicateLocationContainer">
+            <span class="duplicateLocation" th:text="${duplicate.location}">duplicate location</span>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-danger btn-sm">Delete</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

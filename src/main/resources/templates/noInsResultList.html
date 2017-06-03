@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Title</title>
+</head>
+<body>
+<div class="noInsRowsContainer" th:fragment="noInsResultsList">
+
+    <!--<div th:if="${titles == null}" th:text="${'Yes, variable exists!'}">I wonder, if variable exists...</div>-->
+
+    <div  class="row">
+        <div th:each="title: ${noInsTitles}" th:id="'item'+${title.IDfilm}" class=" pull-left browseTitle">
+            <div class="col-md-6">
+                <img class="imageLink"
+                     src="images/download.png"
+                     style="width: 120px;height: 192px;"
+                     th:onclick="'showInfo(\'' + ${title.IDfilm} + '\')'"/>
+            </div>
+            <!-- Adding title-->
+            <div class="col-md-6" style=" position: relative; height:100%">
+                <div class="row">
+                    <div class="titleDiv"
+                         th:text="${#strings.capitalize(title.name)}"></div>
+                </div>
+
+                <!-- Adding buttons-->
+                <div class="buttonDiv">
+                    <div class="row" style="padding-bottom: 5px">
+                        <div class="col-md-4">
+                            <input type="button" value="Info" class="btn  btn-xs buttonStyle"
+                                   th:onclick="'showInfo(\'' + ${title.IDfilm} + '\')'"/>
+                        </div>
+                        <!--<div class="col-md-8">
+                            <input type="button" value="Open" class="btn  btn-xs buttonStyle"
+                                   style="float:left"
+                                   th:onclick="'openFolder(\'' + ${title.IDfilm} + '\')'"/>
+                            <button th:if="${title.IDtype != 4}" type="button"
+                                    class="btn  btn-xs buttonStyle"
+                                    th:onclick="'play(\'' + ${title.IDfilm} + '\')'"><span
+                                    class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+                        </div>-->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="button" value="Edit" class="btn btn-warning btn-xs "
+                                   th:onclick="'editTitleInfo(\'' + ${title.IDfilm} + '\',true)'"/>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="button" class="btn btn-xs clickForTooltip" value="Options"
+                                   th:onclick="'getPopOver(\'' + ${title.IDfilm} + '\',true)'"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

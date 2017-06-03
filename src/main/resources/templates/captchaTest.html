@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Catalog</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
+    <link href="http://cdn.jsdelivr.net/webjars/bootstrap/3.3.4/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/3.3.4/css/bootstrap.min.css}"
+          rel="stylesheet" media="screen" />
+
+    <script src="http://cdn.jsdelivr.net/webjars/jquery/2.1.4/jquery.min.js"
+            th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+
+    <!--<link href="../static/css/main.css" th:href="@{css/main.css}" rel="stylesheet" media="screen"/>
+    <link href="../static/css/style.css" th:href="@{css/style.css}" rel="stylesheet" media="screen"/>-->
+
+    <link rel="stylesheet" type="text/css" href="../static/css/jquery.realperson.css" th:href="@{css/jquery.realperson.css}"  />
+    <script type="text/javascript" src="../static/js/jquery.plugin.js" th:src="@{js/jquery.plugin.js}"></script>
+    <script type="text/javascript" src="../static/js/jquery.realperson.js" th:src="@{js/jquery.realperson.js}"></script>
+    <script type="text/javascript">
+        $(document).ready()
+        {
+            //vrati rezultate
+            //getAllTitles('All');
+            //thymeleafTestings();
+
+        }
+
+    </script>
+</head>
+<body>
+<div class="container" style="width:400px">
+    <div>
+        <a href="/login?lang=en" th:text="#{login.label.englishLanguage}">english</a>
+        &nbsp;|&nbsp;
+        <a href="/login?lang=rs" th:text="#{login.label.serbianLanguage}">serbian</a>
+    </div>
+
+    <form class="form-signin" th:action="@{/login}" method="post">
+        <div class="additionalDiv">
+
+            <div><img class="img-responsive" src="/getCaptchaImage" /><br />
+                <input type="text" id="captcha" class="form-control input-field-padding" name="defaultReal" placeholder="Type the text from the image"/>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!-- /container -->
+</body>
+</html>

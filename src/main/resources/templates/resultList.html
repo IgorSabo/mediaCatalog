@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Title</title>
+</head>
+<body>
+<div class="rowsContainer" th:fragment="resultsList">
+
+    <!--<div th:if="${titles == null}" th:text="${'Yes, variable exists!'}">I wonder, if variable exists...</div>-->
+
+    <div class="row">
+        <div th:each="title: ${titles}" th:id="'item'+${title.IDfilm}" class=" pull-left browseTitle">
+            <div class="col-md-6">
+                <img class="imageLink"
+                     th:src="${title.picture} == 'N/A' ? '/NoviKatalogFilmova/src/main/webapp/resources/theme1/images/download.png' : ${title.picture}"
+                     style="width: 120px;height: 192px;"
+                     th:onclick="'showInfo(\'' + ${title.IDfilm} + '\')'"/>
+            </div>
+            <!-- Adding title-->
+            <div class="col-md-6" style=" position: relative; height:100%">
+                <div class="row">
+                    <div class="titleDiv"
+                         th:text="${#strings.capitalize(title.imdbTitle)} + ' ' + '('+${title.year}+')'"></div>
+                </div>
+
+                <!-- Adding quality-->
+                <div class="row">
+                    <div class="qualityDiv"><b>Quality:</b><span th:text="${title.quality}"/></div>
+                </div>
+
+                <!-- Adding genre-->
+                <div class="row">
+                    <div class="genreDiv"><b>Genre:</b><span th:text="${title.genre}"/></div>
+                </div>
+
+                <!-- Adding buttons-->
+                <div class="buttonDiv">
+                    <div class="row" style="padding-bottom: 5px">
+                        <div class="col-md-4">
+                            <input type="button" value="Info" class="btn  btn-xs buttonStyle"
+                                   th:onclick="'showInfo(\'' + ${title.IDfilm} + '\')'"/>
+                        </div>
+                        <!--th:onclick="'openFolder(\'' + ${#strings.replace(title.location,T(java.lang.System).getProperty('file.separator'),'/')} + '\')'"/>-->
+                        <div class="col-md-8">
+                            <input type="button" value="Open" class="btn  btn-xs buttonStyle"
+                                   style="float:left"
+                                    th:onclick="'openFolder(\'' + ${title.IDfilm} + '\')'"/>
+                            <button th:if="${title.IDtype != 4}" type="button"
+                                    class="btn  btn-xs buttonStyle"
+                                    th:onclick="'play(\'' + ${title.IDfilm} + '\')'"><span
+                                    class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="button" value="Edit" class="btn btn-warning btn-xs "
+                                   th:onclick="'editTitleInfo(\'' + ${title.IDfilm} + '\',false)'"/>
+                        </div>
+                        <div class="col-md-8">
+                            <input th:id="${'clickForTooltip'+title.IDfilm}" type="button" class="btn btn-xs clickForTooltip" value="Options" data-original-title="popover"
+                                   th:onclick="'getPopOver(\'' + ${title.IDfilm} + '\',false,'+${title.mustWatch}+','+${title.favorite}+','+${title.incorrect}+')'"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
