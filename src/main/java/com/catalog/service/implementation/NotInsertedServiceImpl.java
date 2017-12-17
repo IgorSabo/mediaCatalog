@@ -37,4 +37,9 @@ public class NotInsertedServiceImpl implements NotInsertedService {
         notInsertedRepository.delete(id);
     }
 
+    @Override
+    @Transactional
+    public void save(NotInserted notInserted) {
+        notInsertedRepository.save(notInserted);
+    }
 }

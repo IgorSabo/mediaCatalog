@@ -25,7 +25,7 @@ public class FetchFromIMDB {
 
     public static void main(String[] args){
                                                                               //d272326e467344029e68e3c4ff0b4059
-        String tmp = getHtml("https://api.themoviedb.org/3/search/multi?api_key=38ccab0eb65556e3fcba91a87e7b5662&language=en-US&query=john+wick+chapter+2");
+        String tmp = getHtml("http://www.omdbapi.com/?i=tt1836808&apikey=8d51e39d");
         System.out.println("Response is: "+tmp);
     }
 
@@ -33,7 +33,7 @@ public class FetchFromIMDB {
     public static JSONObject fetch(String IMDBID){
         String IMDBUrl=""; 
 
-        IMDBUrl="http://www.omdbapi.com/?i="+IMDBID+"&plot=full&r=json";
+        IMDBUrl="http://www.omdbapi.com/?i="+IMDBID+"&plot=full&r=json&apikey=8d51e39d";
         
        
         String tmp = getHtml(fixURL(IMDBUrl));

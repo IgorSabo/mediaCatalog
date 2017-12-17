@@ -11,4 +11,5 @@ public interface NotInsertedService {
     public List<NotInserted> getAllResults();
     public NotInserted getOne(int id);
     public void removeFromNotInserted(int id);
+    void save(NotInserted notInserted);
 }

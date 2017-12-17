@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/catalog.iml" filepath="$PROJECT_DIR$/catalog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utorrent-api.iml" filepath="$PROJECT_DIR$/utorrent-api.iml" />
     </modules>
   </component>
 </project>

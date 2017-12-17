@@ -11,14 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 
 /**
- *
  * @author Gile
  */
 @Entity
 public class Title {
     @Id
     private int IDfilm;
-    
+
     @Column(name = "rawname")
     private String rawName;
 
@@ -34,18 +33,21 @@ public class Title {
     private String quality;
     private String actors;
     private String picture;
-    
+
     @Column(name = "lastadded")
     private int lastAdded;
-    
+
     @Column(name = "mustwatch")
     private int mustWatch;
-    
+
     private int favorite;
     private int incorrect;
-    
-    
-    
+    private Float imdbRating;
+
+    @Lob
+    private String apiResponse;
+
+
     public int getIDfilm() {
         return IDfilm;
     }
@@ -161,17 +163,32 @@ public class Title {
     public int getFavorite() {
         return favorite;
     }
-    
+
     public void setFavorite(int favorite) {
         this.favorite = favorite;
     }
 
-	public int getIncorrect() {
-		return incorrect;
-	}
+    public int getIncorrect() {
+        return incorrect;
+    }
 
-	public void setIncorrect(int incorrect) {
-		this.incorrect = incorrect;
-	}
-    
+    public void setIncorrect(int incorrect) {
+        this.incorrect = incorrect;
+    }
+
+    public Float getImdbRating() {
+        return imdbRating;
+    }
+
+    public void setImdbRating(Float imdbRating) {
+        this.imdbRating = imdbRating;
+    }
+
+    public String getApiResponse() {
+        return apiResponse;
+    }
+
+    public void setApiResponse(String apiResponse) {
+        this.apiResponse = apiResponse;
+    }
 }

@@ -132,13 +132,6 @@ public class TitleServiceImpl implements TitleService {
 
 	}
 
-/**/
-
-	
-
-	
-
-
 	@Transactional
 	@Override
 	public void deleteTitle(int titleId) {

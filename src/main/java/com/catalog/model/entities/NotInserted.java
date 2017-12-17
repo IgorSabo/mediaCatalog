@@ -21,7 +21,7 @@ public class NotInserted {
         return IDfilm;
     }
 
-    public void getIDfilm(int IDfilm) {
+    public void setIDfilm(int IDfilm) {
         this.IDfilm = IDfilm;
     }
 
