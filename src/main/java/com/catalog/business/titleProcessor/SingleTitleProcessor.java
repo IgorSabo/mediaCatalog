@@ -43,17 +43,13 @@ public class SingleTitleProcessor implements Callable<Map<RawNames, Title>> {
     private String path = "";
     private HashMap<String, String> typeMap = new HashMap<String, String>();
     private HashMap<String, String> genreMap = new HashMap<String, String>();
-    private double progressIncrement;
-    private HttpSession session;
 
-    public SingleTitleProcessor(RawNames rawName, HashMap<String, String> typeMap, HashMap<String, String> genreMap, String apiKey, String apiUrl, HttpSession session, double progressIncrement ) {
+    public SingleTitleProcessor(RawNames rawName, HashMap<String, String> typeMap, HashMap<String, String> genreMap, String apiKey, String apiUrl ) {
         this.rawName = rawName;
         this.typeMap = typeMap;
         this.genreMap = genreMap;
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
-        this.session = session;
-        this.progressIncrement = progressIncrement;
     }
 
     @Override

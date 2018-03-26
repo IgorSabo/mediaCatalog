@@ -99,7 +99,7 @@ public class TitleServiceImpl implements TitleService {
 
 		for( RawNames rawName : list ){
 			//tasks.add( new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
-			completionService.submit(new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
+			completionService.submit(new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl));
 		}
 
 		try {
