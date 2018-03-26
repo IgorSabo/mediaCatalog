@@ -2,24 +2,30 @@ package com.catalog.service.implementation;
 
 //import com.example.dao.rawnames.RawNamesDAO;
 import com.catalog.business.repository.TitleRepository;
+import com.catalog.business.titleProcessor.SingleTitleProcessor;
 import com.catalog.business.utils.Duplicate;
-import com.catalog.model.entities.Title;
+import com.catalog.model.entities.*;
+import com.catalog.service.GenreService;
+import com.catalog.service.NotInsertedService;
 import com.catalog.service.TitleService;
 //import com.example.utils.CntTablesManipulator;
+import com.catalog.service.TypeService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.*;
 
 /*import com.example.utils.CntTablesManipulator;
 import com.example.utils.CreateEntities;
@@ -47,7 +53,151 @@ public class TitleServiceImpl implements TitleService {
 	@Autowired
 	TitleRepository titleRepository;
 
-	
+	@Autowired
+	NotInsertedService notInsertedService;
+
+	@Autowired
+	TypeService typeService;
+
+	@Autowired
+	GenreService genreService;
+
+	private static final DecimalFormat df2 = new DecimalFormat(".##");
+
+
+	@Value( "${apikey}" )
+	private String apiKey;
+
+	@Value( "${apiUrl}" )
+	private String apiUrl;
+
+	@Override
+	public void processNewTitles(List<RawNames> list, HttpSession session) {
+
+		double progressIncrement = 100/list.size();
+
+		HashMap<String, String> typeMap = new HashMap<String, String>();
+		HashMap<String, String> genreMap = new HashMap<String, String>();
+
+		ExecutorService executor = Executors.newFixedThreadPool(20);
+		final ExecutorCompletionService<Map<RawNames, Title>> completionService = new ExecutorCompletionService<>(executor);
+
+
+
+		Collection<Callable<Map<RawNames, Title>>> tasks = new ArrayList<>();
+
+		// initialize types map
+		ArrayList<Type> types = typeService.findAll();
+		for( Type type : types ){
+			typeMap.put(String.valueOf(type.getIDtype()), type.getName());
+		}
+
+		// initialize genres map
+		for(Genre genre : genreService.findAll()){
+			genreMap.put(genre.getName(), String.valueOf(genre.getIDgenre()));
+		}
+
+		for( RawNames rawName : list ){
+			//tasks.add( new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
+			completionService.submit(new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
+		}
+
+		try {
+
+			for( int i=0; i< list.size(); i++ ){
+
+				Future<Map<RawNames, Title>> result = completionService.take();
+				Map<RawNames, Title> title = (HashMap)  result.get();
+
+				//update progress
+				updateProgress(session, progressIncrement, title);
+
+				Map.Entry<RawNames, Title> entry = title.entrySet().iterator().next();
+
+				if( entry.getValue() != null ){
+					//insert new title
+					titleRepository.save(entry.getValue());
+				}
+				else{
+					//insert into not inserted
+					RawNames rawName = entry.getKey();
+					NotInserted noIns = new NotInserted();
+					noIns.setIDfilm(Integer.valueOf(rawName.getIDname()));
+					noIns.setLocation(rawName.getLocation());
+					noIns.setName(rawName.getName());
+					noIns.setType(rawName.getType());
+					notInsertedService.save(noIns);
+				}
+
+			}
+
+			//List<Future<Map<RawNames, Title>>> results = executor.invokeAll(tasks);
+
+			/*for(Future<Map<RawNames, Title>> result : results){
+				Map<RawNames, Title> title = (HashMap) result.get();
+
+				for( Map.Entry<RawNames, Title> set : title.entrySet() ){
+
+					if( set.getValue() != null ){
+						//insert new title
+						titleRepository.save(set.getValue());
+					}
+					else{
+						//insert into not inserted
+						RawNames rawName = set.getKey();
+						NotInserted noIns = new NotInserted();
+						noIns.setIDfilm(Integer.valueOf(rawName.getIDname()));
+						noIns.setLocation(rawName.getLocation());
+						noIns.setName(rawName.getName());
+						noIns.setType(rawName.getType());
+						notInsertedService.save(noIns);
+					}
+
+			}}*/
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+
+
+		executor.shutdown();
+
+	}
+
+	public synchronized void updateProgress(HttpSession session, double progressIncrement, Map<RawNames, Title> title){
+
+		Map.Entry<RawNames, Title> entry = title.entrySet().iterator().next();
+		System.out.println(entry.getKey().getName()+" is calling updateProgress()");
+
+		Double status = (Double) session.getAttribute("status");
+		if( status != null ){
+			status += progressIncrement;
+		}else{
+			status = 0.0;
+		}
+		System.out.println("Setting progress to: "+status);
+		session.setAttribute("status", status);
+	}
+
+	@Override
+	public String returnProgress(HttpSession session) {
+
+		Double status = (Double) session.getAttribute("status");
+
+		if( status != null ){
+			if( status == 100 || status >100 ){
+				return "done";
+			}
+			return df2.format(status);
+		}else{
+			status = 0.0;
+		}
+
+		session.setAttribute("status", status);
+		return  df2.format(status);
+	}
+
 	@Override
 	@Transactional
 	public void createTitle(Title title) {

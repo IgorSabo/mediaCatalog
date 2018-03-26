@@ -479,6 +479,34 @@ function changeNumPerPage()
 	getAllTitles();
 }
 
+function updateProgress(){
+	var result = '';
+
+	$.ajax({
+		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+		async: false,
+		type: "POST",
+		url: "getResponseStatus",
+		success: function (server_response)
+		{
+			result = server_response;
+			if( result != 'done' ){
+				$('.progress-bar').width(result+'%');
+				$('.progress-bar').html(result+'%');
+			}
+		}
+	}).done(function() {
+		//return result;
+	});
+	if( result != 'done' ){
+		setTimeout(updateProgress, 2000);
+	}else{
+		$('.progress-bar').width('100%');
+		$('.progress-bar').html('100%');
+	}
+
+}
+
 function synchonizationCalled()
 {
 	$('#modalSync').modal('show');
@@ -495,7 +523,11 @@ function synchonizationCalled()
 	}).done(function() {
 		$('#modalSync').modal('hide');
 		getAllTitles('All');
-	});
+	});/**/
+
+	//check for progress update
+	updateProgress();
+
 }
 function deleteFromDatabase(isNotInserted)
 {
@@ -655,10 +687,12 @@ function saveChanges(idTitle, isNotInserted)
 	{
 		url="SaveChangesForNotInserted?IMDBlink="+imdbLink+"&"
 	}
+
+	url = url +"IDfilm="+idTitle+"&picture="+encodeURIComponent(imgUrl)+"&location="+encodeURIComponent(location)+"&actors="+encodeURIComponent(actors)+"&description="+encodeURIComponent(plot)+"&genre="+genre+"&quality="+quality+"&year="+year+"&rawName="+encodeURIComponent(name)+"&imdbTitle="+encodeURIComponent(name)+"&IDtype="+type;
 	$.ajax({
 		contentType: "application/x-www-form-urlencoded; charset=UTF-8",
 		type: "POST",
-		url: url+"IDfilm="+idTitle+"&picture="+imgUrl+"&location="+location+"&actors="+actors+"&description="+plot+"&genre="+genre+"&quality="+quality+"&year="+year+"&rawName="+name+"&imdbTitle="+name+"&IDtype="+type,
+		url: url,
 		success: function (server_response)
 		{
 			alert('Title changed!');
@@ -1020,4 +1054,9 @@ function displayDuplicateInfo(id) {
 
 		}
 	});
+}
+
+function escapeHtml(unsafe) {
+	return unsafe
+		.replace(/&/g, "\&");
 }

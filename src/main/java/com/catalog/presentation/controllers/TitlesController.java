@@ -11,6 +11,7 @@ import com.catalog.business.utils.*;
 import com.catalog.model.*;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +79,14 @@ public class TitlesController {
 	@Autowired
 	private MediaFolderService mediaFolderService;
 
+	@Autowired
+	private FetchFromIMDB fetchFromIMDB;
+
+	@Value( "${apikey:def}" )
+	private String apiKey;
+
+	@Value( "${apiUrl:def}" )
+	private String apiUrl;
 
 	@RequestMapping(value = "/titles")
 	private ModelAndView homepage(Principal principal)
@@ -203,7 +213,8 @@ public class TitlesController {
 	public @ResponseBody JSONObject fetchFromIMDB(HttpServletRequest request)
 	{
 		String IMDBID =request.getParameter("IMDBID");
-		JSONObject response=FetchFromIMDB.fetch(IMDBID);
+		System.out.println("apiKey = "+apiKey);
+		JSONObject response=fetchFromIMDB.fetch(IMDBID, apiKey, apiUrl);
 		System.out.println(response);
 
 		return response;
@@ -231,7 +242,7 @@ public class TitlesController {
 	}
 	
 	@RequestMapping(value="/Synchronize", method= RequestMethod.POST)
-	public ModelAndView synchornizeTitles()
+	public ModelAndView synchornizeTitles(HttpSession session)
 	{
 		//synchronizing titles
 		//napuni bazu sa novim imenima
@@ -239,9 +250,12 @@ public class TitlesController {
 		List<RawNames> list = rawNamesService.findByLastAdded(1);
 		if(list.size()>0)
 		{
-			createEntities.createTitlesAlt((ArrayList)list);
+			//createEntities.createTitlesAlt((ArrayList)list);
+			titleService.processNewTitles(list, session);
 		}
 
+		//removing status from session
+		session.removeAttribute("status");
 
 		//updating count tables
 		System.out.println("Updating count tables");
@@ -250,6 +264,12 @@ public class TitlesController {
 		System.out.println("Synchronization completed!");
 		return new ModelAndView("index");
 	}/**/
+
+	@RequestMapping(value="/getResponseStatus", method= RequestMethod.POST)
+	public @ResponseBody String getResponseStatus(HttpSession session){
+
+		return titleService.returnProgress(session);
+	}
 	
 	@RequestMapping(value="/DeleteTitle", method= RequestMethod.POST)
 	public ModelAndView delete(HttpServletRequest request)

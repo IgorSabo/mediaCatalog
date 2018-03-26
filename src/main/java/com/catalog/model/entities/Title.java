@@ -48,6 +48,30 @@ public class Title {
     private String apiResponse;
 
 
+    @Override
+    public String toString() {
+        return "Title{" +
+                "IDfilm=" + IDfilm +
+                ", rawName='" + rawName + '\'' +
+                ", imdbTitle='" + imdbTitle + '\'' +
+                ", IDtype=" + IDtype +
+                ", genre='" + genre + '\'' +
+                ", year='" + year + '\'' +
+                ", IMDBlink='" + IMDBlink + '\'' +
+                ", location='" + location + '\'' +
+                ", description='" + description + '\'' +
+                ", quality='" + quality + '\'' +
+                ", actors='" + actors + '\'' +
+                ", picture='" + picture + '\'' +
+                ", lastAdded=" + lastAdded +
+                ", mustWatch=" + mustWatch +
+                ", favorite=" + favorite +
+                ", incorrect=" + incorrect +
+                ", imdbRating=" + imdbRating +
+                ", apiResponse='" + apiResponse + '\'' +
+                '}';
+    }
+
     public int getIDfilm() {
         return IDfilm;
     }

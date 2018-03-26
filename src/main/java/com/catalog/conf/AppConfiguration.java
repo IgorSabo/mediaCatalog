@@ -12,8 +12,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 //import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.ui.velocity.VelocityEngineFactoryBean;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -74,7 +78,17 @@ public class AppConfiguration extends WebMvcConfigurerAdapter {
     public StandardServletMultipartResolver resolver() {
         return new StandardServletMultipartResolver();
     }
-	
+
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer properties(){
+		PropertySourcesPlaceholderConfigurer pspc
+				= new PropertySourcesPlaceholderConfigurer();
+		Resource[] resources = new ClassPathResource[ ]
+				{ new ClassPathResource( "application.properties" ) };
+		pspc.setLocations( resources );
+		pspc.setIgnoreUnresolvablePlaceholders( true );
+		return pspc;
+	}
     /*@Bean(name="multipartResolver") 
     public CommonsMultipartResolver getResolver() throws IOException{
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();

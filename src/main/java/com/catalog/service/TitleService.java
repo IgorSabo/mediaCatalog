@@ -1,8 +1,10 @@
 package com.catalog.service;
 
 import com.catalog.business.utils.Duplicate;
+import com.catalog.model.entities.RawNames;
 import com.catalog.model.entities.Title;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,5 +42,9 @@ public interface TitleService {
     public List<Duplicate> getDuplicates();
 
     public List<Title> findByImdbTitle(String title);
+
+    void processNewTitles(List<RawNames> list, HttpSession session);
+
+    String returnProgress(HttpSession session);
 
 }
