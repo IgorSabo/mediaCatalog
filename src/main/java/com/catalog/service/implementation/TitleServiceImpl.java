@@ -1,15 +1,17 @@
 package com.catalog.service.implementation;
 
 //import com.example.dao.rawnames.RawNamesDAO;
+import com.catalog.business.assemblers.TitleJsonResponseAssembler;
+import com.catalog.business.assemblers.TitleRatingsAssembler;
+import com.catalog.business.jobs.JobType;
 import com.catalog.business.repository.TitleRepository;
 import com.catalog.business.titleProcessor.SingleTitleProcessor;
+import com.catalog.business.utils.CntTablesManipulator;
 import com.catalog.business.utils.Duplicate;
+import com.catalog.business.utils.FillDatabase;
 import com.catalog.model.entities.*;
-import com.catalog.service.GenreService;
-import com.catalog.service.NotInsertedService;
-import com.catalog.service.TitleService;
+import com.catalog.service.*;
 //import com.example.utils.CntTablesManipulator;
-import com.catalog.service.TypeService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
@@ -23,6 +25,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.*;
@@ -62,6 +66,27 @@ public class TitleServiceImpl implements TitleService {
 	@Autowired
 	GenreService genreService;
 
+	@Autowired
+	private TitleJsonResponseAssembler titleJsonResponseAssembler;
+
+	@Autowired
+	private TitleRatingsAssembler titleRatingsAssembler;
+
+	@Autowired
+	private TitleJsonResponseService titleJsonResponseService;
+
+	@Autowired
+	ScheduledJobService scheduledJobService;
+
+	@Autowired
+	private CntTablesManipulator cntTablesManipulator;
+
+	@Autowired
+	private FillDatabase fillDatabase;
+
+	@Autowired
+	private RawNamesService rawNamesService;
+
 	private static final DecimalFormat df2 = new DecimalFormat(".##");
 
 
@@ -72,79 +97,90 @@ public class TitleServiceImpl implements TitleService {
 	private String apiUrl;
 
 	@Override
-	public void processNewTitles(List<RawNames> list, HttpSession session) {
-
-		double progressIncrement = 100/list.size();
-
-		HashMap<String, String> typeMap = new HashMap<String, String>();
-		HashMap<String, String> genreMap = new HashMap<String, String>();
-
-		ExecutorService executor = Executors.newFixedThreadPool(20);
-		final ExecutorCompletionService<Map<RawNames, Title>> completionService = new ExecutorCompletionService<>(executor);
+	public void processNewTitles( HttpSession session) {
 
 
+		boolean executeSynchronization = false;
+		ScheduledJob activeJob = scheduledJobService.findLastScheduledJob(JobType.SYNCHRONIZATION_JOB);
 
-		Collection<Callable<Map<RawNames, Title>>> tasks = new ArrayList<>();
+		//fill db with new names
+		fillDatabase.getNames();
+		List<RawNames> list = rawNamesService.findByLastAdded(1);
 
-		// initialize types map
-		ArrayList<Type> types = typeService.findAll();
-		for( Type type : types ){
-			typeMap.put(String.valueOf(type.getIDtype()), type.getName());
+		//determine if synchronization job is in progress
+		if( ( activeJob == null || activeJob.getEndTime() != null ) && list.size() > 0 ){
+			executeSynchronization = true;
 		}
 
-		// initialize genres map
-		for(Genre genre : genreService.findAll()){
-			genreMap.put(genre.getName(), String.valueOf(genre.getIDgenre()));
-		}
 
-		for( RawNames rawName : list ){
-			//tasks.add( new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
-			completionService.submit(new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl));
-		}
+		//start synchronization only if no active SYNCHRONIZATION_JOB job is found or running
+		if( executeSynchronization ){
+			double progressIncrement = list.size()/100;
 
-		try {
+			HashMap<String, String> typeMap = new HashMap<String, String>();
+			HashMap<String, String> genreMap = new HashMap<String, String>();
 
-			for( int i=0; i< list.size(); i++ ){
+			ExecutorService executor = Executors.newFixedThreadPool(20);
+			final ExecutorCompletionService<Map<RawNames, Title>> completionService = new ExecutorCompletionService<>(executor);
 
-				Future<Map<RawNames, Title>> result = completionService.take();
-				Map<RawNames, Title> title = (HashMap)  result.get();
 
-				//update progress
-				updateProgress(session, progressIncrement, title);
 
-				Map.Entry<RawNames, Title> entry = title.entrySet().iterator().next();
+			Collection<Callable<Map<RawNames, Title>>> tasks = new ArrayList<>();
 
-				if( entry.getValue() != null ){
-					//insert new title
-					titleRepository.save(entry.getValue());
-				}
-				else{
-					//insert into not inserted
-					RawNames rawName = entry.getKey();
-					NotInserted noIns = new NotInserted();
-					noIns.setIDfilm(Integer.valueOf(rawName.getIDname()));
-					noIns.setLocation(rawName.getLocation());
-					noIns.setName(rawName.getName());
-					noIns.setType(rawName.getType());
-					notInsertedService.save(noIns);
-				}
-
+			// initialize types map
+			ArrayList<Type> types = typeService.findAll();
+			for( Type type : types ){
+				typeMap.put(String.valueOf(type.getIDtype()), type.getName());
 			}
 
-			//List<Future<Map<RawNames, Title>>> results = executor.invokeAll(tasks);
+			// initialize genres map
+			for(Genre genre : genreService.findAll()){
+				genreMap.put(genre.getName(), String.valueOf(genre.getIDgenre()));
+			}
 
-			/*for(Future<Map<RawNames, Title>> result : results){
-				Map<RawNames, Title> title = (HashMap) result.get();
+			for( RawNames rawName : list ){
+				//tasks.add( new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl, session, progressIncrement ));
+				completionService.submit(new SingleTitleProcessor(rawName, typeMap,genreMap, apiKey, apiUrl));
+			}
 
-				for( Map.Entry<RawNames, Title> set : title.entrySet() ){
+			try {
 
-					if( set.getValue() != null ){
+				for( int i=0; i< list.size(); i++ ){
+
+					Future<Map<RawNames, Title>> result = completionService.take();
+					Map<RawNames, Title> title = (HashMap)  result.get();
+
+					//update progress
+					if( session != null )
+						updateProgress(session, progressIncrement, list.size(), title);
+
+					Map.Entry<RawNames, Title> entry = title.entrySet().iterator().next();
+
+					if( entry.getValue() != null ){
 						//insert new title
-						titleRepository.save(set.getValue());
+						entry.getValue().toString();
+
+						//save title
+						Title response = entry.getValue();
+						titleRepository.save(response);
+
+						//creating title json response
+						TitleJsonResponse jsonResponse =  titleJsonResponseAssembler.assembleTitleJsonResponseFromJson(response.getApiResponse());
+
+						//creating title ratings for title json response
+						Set<TitleRating> ratings = titleRatingsAssembler.assembleRatingsForTitle(response.getApiResponse());
+
+						for( TitleRating rating : ratings ){
+							rating.setTitleJsonResponse(jsonResponse);
+						}
+						jsonResponse.setRatings(ratings);
+						jsonResponse.setTitleEntity(response);
+
+						titleJsonResponseService.saveTitleJsonResponse(jsonResponse);
 					}
 					else{
 						//insert into not inserted
-						RawNames rawName = set.getKey();
+						RawNames rawName = entry.getKey();
 						NotInserted noIns = new NotInserted();
 						noIns.setIDfilm(Integer.valueOf(rawName.getIDname()));
 						noIns.setLocation(rawName.getLocation());
@@ -153,31 +189,39 @@ public class TitleServiceImpl implements TitleService {
 						notInsertedService.save(noIns);
 					}
 
-			}}*/
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+
+
+			executor.shutdown();
+
+
+			//updating count tables
+			System.out.println("Updating count tables");
+			cntTablesManipulator.updateCountTables();
 		}
 
 
-		executor.shutdown();
 
 	}
 
-	public synchronized void updateProgress(HttpSession session, double progressIncrement, Map<RawNames, Title> title){
+	public synchronized void updateProgress(HttpSession session, double progressIncrement, int listSize, Map<RawNames, Title> title){
 
 		Map.Entry<RawNames, Title> entry = title.entrySet().iterator().next();
 		System.out.println(entry.getKey().getName()+" is calling updateProgress()");
 
 		Double status = (Double) session.getAttribute("status");
 		if( status != null ){
-			status += progressIncrement;
+			status += BigDecimal.valueOf(( (double ) 100 )/ listSize).setScale(3, RoundingMode.HALF_UP).doubleValue();
 		}else{
 			status = 0.0;
 		}
-		System.out.println("Setting progress to: "+status);
-		session.setAttribute("status", status);
+		System.out.println("Setting progress to: "+BigDecimal.valueOf(status).setScale(3, RoundingMode.HALF_UP).doubleValue());
+		session.setAttribute("status", BigDecimal.valueOf(status).setScale(3, RoundingMode.HALF_UP).doubleValue());
 	}
 
 	@Override
@@ -299,12 +343,12 @@ public class TitleServiceImpl implements TitleService {
 	}
 
 	@Override
-	public List<Object[]> getQuickSearchResults(String word) {
+	public Set<Object[]> getQuickSearchResults(String word) {
 		return titleRepository.getQuickSearchResults(word);
 	}
 
 	@Override
-	public List<Title> getResults(String type, int page, int perPage, String genre, String year) {
+	public Set<Title> getResults(String type, int page, int perPage, String genre, String year) {
 		return titleRepository.getResults(type, page, perPage, genre, year);
 	}
 
@@ -319,19 +363,20 @@ public class TitleServiceImpl implements TitleService {
 	}
 
 	@Override
-	public List<Duplicate> getDuplicates() {
+	public Set<Duplicate> getDuplicates() {
 
-		List<Duplicate> duplicates = new ArrayList();
+		Set<Duplicate> duplicates = new HashSet();
 		List<Object[]> list = titleRepository.getDuplicates();
 		for(Object[] obj : list){
 			duplicates.add(new Duplicate((int) obj[1], (String) obj[3], (String) obj[2], (long) obj[0]));
 		}
 
+
 		return duplicates;
 	}
 
 	@Override
-	public List<Title> findByImdbTitle(String title) {
+	public Set<Title> findByImdbTitle(String title) {
 		return titleRepository.findByImdbTitle(title);
 	}
 

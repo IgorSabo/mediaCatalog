@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Table(name="rawnames")
 public class RawNames {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int IDname;
     String name;
     String type;

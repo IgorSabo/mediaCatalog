@@ -7,6 +7,7 @@ import com.catalog.model.entities.Title;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Gile on 8/30/2016.
@@ -31,19 +32,19 @@ public interface TitleService {
 
     //public void synchronizeTitles();
 
-    public List<Object[]> getQuickSearchResults(String word);
+    public Set<Object[]> getQuickSearchResults(String word);
 
-    public List<Title> getResults(String type, int page, int perPage, String genre, String year);
+    public Set<Title> getResults(String type, int page, int perPage, String genre, String year);
 
     public Number getTotalEntities();
 
     public Title getTitle(int IDtitle);
 
-    public List<Duplicate> getDuplicates();
+    public Set<Duplicate> getDuplicates();
 
-    public List<Title> findByImdbTitle(String title);
+    public Set<Title> findByImdbTitle(String title);
 
-    void processNewTitles(List<RawNames> list, HttpSession session);
+    void processNewTitles(HttpSession session);
 
     String returnProgress(HttpSession session);
 

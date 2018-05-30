@@ -23,10 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.security.Principal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;*/
@@ -66,9 +63,6 @@ public class TitlesController {
 	
 	@Autowired
 	private CreateEntities createEntities;
-	
-	@Autowired
-	private CntTablesManipulator cntTablesManipulator;
 
 	@Autowired
 	private CntByGenreService cntByGenreService;
@@ -94,7 +88,7 @@ public class TitlesController {
 		System.out.println("Ulazak u kontroler za /titles");
 		//LOGGER.info("switching to home page");
 		ModelAndView mv = new ModelAndView("index");
-		ArrayList<Title> list = (ArrayList<Title>) titleService.getResults("All", 0, 12, null, null);
+		Set<Title> list =  titleService.getResults("All", 0, 12, null, null);
 		//LOGGER.info("Username is: {} ", principal.getName());
 		//mv.addObject("userName", principal.getName());
 		mv.addObject("titles",list);
@@ -145,8 +139,8 @@ public class TitlesController {
 			year=null;
 		}
 		
-		ArrayList<Title> list = (ArrayList<Title>) titleService.getResults(type, Integer.valueOf(page), Integer.valueOf(perPage), genre, year);
-		Map<String,List<Title>> map = new HashMap<String,List<Title>>();
+		Set<Title> list =  titleService.getResults(type, Integer.valueOf(page), Integer.valueOf(perPage), genre, year);
+		Map<String,Set<Title>> map = new HashMap<>();
 
 		map.put("titles", list);
 		
@@ -246,20 +240,16 @@ public class TitlesController {
 	{
 		//synchronizing titles
 		//napuni bazu sa novim imenima
-		fillDatabase.getNames();
+		/*fillDatabase.getNames();
 		List<RawNames> list = rawNamesService.findByLastAdded(1);
 		if(list.size()>0)
-		{
+		{*/
 			//createEntities.createTitlesAlt((ArrayList)list);
-			titleService.processNewTitles(list, session);
-		}
+			titleService.processNewTitles(session);
+		//}
 
 		//removing status from session
 		session.removeAttribute("status");
-
-		//updating count tables
-		System.out.println("Updating count tables");
-		cntTablesManipulator.updateCountTables();
 
 		System.out.println("Synchronization completed!");
 		return new ModelAndView("index");
@@ -390,7 +380,7 @@ public class TitlesController {
 
 		List<MediaFolder> listOfFolders = mediaFolderService.getAllMediaFolders();
 
-		List<Duplicate> duplicates = titleService.getDuplicates();
+		Set<Duplicate> duplicates = titleService.getDuplicates();
 
 		ModelAndView mv=new ModelAndView("generalOptions");
 		mv.addObject("listOfFolders", listOfFolders);
@@ -407,7 +397,7 @@ public class TitlesController {
 		String imdbTitle = title.getImdbTitle();
 
 
-		List<Title> duplicateTitles = titleService.findByImdbTitle(imdbTitle);
+		Set<Title> duplicateTitles = titleService.findByImdbTitle(imdbTitle);
 		model.addAttribute("duplicates",duplicateTitles);
 		return "duplicateInfo :: duplicateInfo";
 

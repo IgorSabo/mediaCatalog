@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 public interface TitleRepositoryCustom {
@@ -15,9 +16,9 @@ public interface TitleRepositoryCustom {
 	
 	//public void synchronizeTitles();
 	
-	public List<Object[]> getQuickSearchResults(String word);
+	public Set<Object[]> getQuickSearchResults(String word);
 
-	public List<Title> getResults(String type, int page, int perPage, String genre, String year);
+	public Set<Title> getResults(String type, int page, int perPage, String genre, String year);
 
 	public Number getTotalEntities();
 

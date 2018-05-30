@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 public interface TitleRepository extends CrudRepository<Title, Integer>, TitleRepositoryCustom {
@@ -14,7 +15,7 @@ public interface TitleRepository extends CrudRepository<Title, Integer>, TitleRe
     @Query("select count(t.imdbTitle), t.IDfilm, t.imdbTitle, t.location from Title t GROUP BY t.imdbTitle having count(t.imdbTitle) > 1")
     public List<Object[]> getDuplicates();
 
-    public List<Title> findByImdbTitle(String title);
+    public Set<Title> findByImdbTitle(String title);
 
 
 }

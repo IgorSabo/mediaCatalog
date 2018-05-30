@@ -5,10 +5,7 @@
  */
 package com.catalog.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 
 /**
  * @author Gile
@@ -47,6 +44,8 @@ public class Title {
     @Lob
     private String apiResponse;
 
+    @OneToOne(mappedBy = "titleEntity", cascade = CascadeType.REMOVE)
+    private TitleJsonResponse titleJsonResponse;
 
     @Override
     public String toString() {
@@ -214,5 +213,13 @@ public class Title {
 
     public void setApiResponse(String apiResponse) {
         this.apiResponse = apiResponse;
+    }
+
+    public TitleJsonResponse getTitleJsonResponse() {
+        return titleJsonResponse;
+    }
+
+    public void setTitleJsonResponse(TitleJsonResponse titleJsonResponse) {
+        this.titleJsonResponse = titleJsonResponse;
     }
 }

@@ -10,10 +10,9 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -28,8 +27,12 @@ public class TitleRepositoryImpl implements TitleRepositoryCustom {
 
     @Override
     @Transactional
-    public List<Title> getResults(String type, int page, int perPage, String genre, String year) {
+    public Set<Title> getResults(String type, int page, int perPage, String genre, String year) {
         Criteria criteria=null;
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        //cb.cre
+
         Session session = em.unwrap(Session.class);
         criteria=session.createCriteria(Title.class);
         System.out.println("Nadjeni sledeci parametri: type="+type+", page="+page+", perPage="+perPage+", forYear: "+year);
@@ -76,12 +79,15 @@ public class TitleRepositoryImpl implements TitleRepositoryCustom {
         criteria.setFirstResult(page);
         criteria.setMaxResults(perPage);
         ArrayList<Title> list =(ArrayList<Title>)criteria.list();
-        return list;
+
+        HashSet<Title> set = new HashSet<>();
+        set.addAll(list);
+        return set;
     }
 
     @Override
     @Transactional
-    public List<Object[]> getQuickSearchResults(String word) {
+    public Set<Object[]> getQuickSearchResults(String word) {
         Session session = em.unwrap(Session.class);
         Criteria criteria=session.createCriteria(Title.class);
         ProjectionList plist = Projections.projectionList();
@@ -93,7 +99,10 @@ public class TitleRepositoryImpl implements TitleRepositoryCustom {
         ArrayList<Object[]> list = (ArrayList<Object[]>) criteria.list();
 
         System.out.println("Size of the results for word "+word+" is "+list.size());
-        return list;
+
+        HashSet<Object[]> set = new HashSet<>();
+        set.addAll(list);
+        return set;
     }
 
 
