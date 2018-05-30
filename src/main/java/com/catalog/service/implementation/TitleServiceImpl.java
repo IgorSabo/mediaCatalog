@@ -5,6 +5,8 @@ import com.catalog.business.assemblers.TitleJsonResponseAssembler;
 import com.catalog.business.assemblers.TitleRatingsAssembler;
 import com.catalog.business.jobs.JobType;
 import com.catalog.business.repository.TitleRepository;
+import com.catalog.business.systemProcesses.ProcessStatus;
+import com.catalog.business.systemProcesses.ProcessType;
 import com.catalog.business.titleProcessor.SingleTitleProcessor;
 import com.catalog.business.utils.CntTablesManipulator;
 import com.catalog.business.utils.Duplicate;
@@ -87,6 +89,9 @@ public class TitleServiceImpl implements TitleService {
 	@Autowired
 	private RawNamesService rawNamesService;
 
+	@Autowired
+	private SystemProcessService systemProcessService;
+
 	private static final DecimalFormat df2 = new DecimalFormat(".##");
 
 
@@ -103,18 +108,23 @@ public class TitleServiceImpl implements TitleService {
 		boolean executeSynchronization = false;
 		ScheduledJob activeJob = scheduledJobService.findLastScheduledJob(JobType.SYNCHRONIZATION_JOB);
 
+
+
+		//determine if synchronization job is in progress
+		if( activeJob == null || activeJob.getEndTime() != null ){
+			executeSynchronization = true;
+		}
+
 		//fill db with new names
 		fillDatabase.getNames();
 		List<RawNames> list = rawNamesService.findByLastAdded(1);
 
-		//determine if synchronization job is in progress
-		if( ( activeJob == null || activeJob.getEndTime() != null ) && list.size() > 0 ){
-			executeSynchronization = true;
-		}
-
-
 		//start synchronization only if no active SYNCHRONIZATION_JOB job is found or running
-		if( executeSynchronization ){
+		if( executeSynchronization && list.size() > 0  ){
+
+			//create new record in system process table for synchronization process
+			SystemProcess syncProcess = systemProcessService.saveSystemProcess(ProcessType.SYNCHRONIZATION_PROCESS);
+
 			double progressIncrement = list.size()/100;
 
 			HashMap<String, String> typeMap = new HashMap<String, String>();
@@ -122,8 +132,6 @@ public class TitleServiceImpl implements TitleService {
 
 			ExecutorService executor = Executors.newFixedThreadPool(20);
 			final ExecutorCompletionService<Map<RawNames, Title>> completionService = new ExecutorCompletionService<>(executor);
-
-
 
 			Collection<Callable<Map<RawNames, Title>>> tasks = new ArrayList<>();
 
@@ -196,9 +204,12 @@ public class TitleServiceImpl implements TitleService {
 				e.printStackTrace();
 			}
 
-
 			executor.shutdown();
 
+			//updating synchronization system process table
+			syncProcess.setEndTime(new Date());
+			syncProcess.setProcessStatus(ProcessStatus.SUCCESS);
+			systemProcessService.saveSystemProcess(syncProcess);
 
 			//updating count tables
 			System.out.println("Updating count tables");

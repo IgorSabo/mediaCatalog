@@ -1,5 +1,6 @@
 package com.catalog.model.entities;
 
+import com.catalog.business.jobs.JobStatus;
 import com.catalog.business.jobs.JobType;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,9 @@ public class ScheduledJob {
     private Date endTime;
 
     private int titlesInserted;
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus jobStatus;
 
     @Override
     public String toString() {

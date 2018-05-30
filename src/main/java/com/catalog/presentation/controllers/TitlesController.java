@@ -165,8 +165,10 @@ public class TitlesController {
     ArrayList<Object[]> getQuickSearchResults( HttpServletRequest request)
 	{
 		String name=request.getParameter("name");
-		
-		ArrayList<Object[]> list = (ArrayList<Object[]>) titleService.getQuickSearchResults(name);
+
+		HashSet<Object[]> set = (HashSet<Object[]>) titleService.getQuickSearchResults(name);
+		ArrayList<Object[]> list = new ArrayList<>();
+		list.addAll(set);
 		return list;
 	}
 	
