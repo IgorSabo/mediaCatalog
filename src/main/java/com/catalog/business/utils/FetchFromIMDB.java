@@ -40,17 +40,17 @@ public class FetchFromIMDB {
         String IMDBUrl=""; 
 
         IMDBUrl="http://www.omdbapi.com/?i="+IMDBID+"&plot=full&r=json&apikey="+apiKey;
-        
-       
-        String tmp = TitleProcessorUtils.getHtml(fixURL(IMDBUrl));
+
         //get json
         JSONParser parser = new JSONParser();
         JSONObject outer= new JSONObject();
         JSONObject obj=null;
+
+        String tmp = tmp = TitleProcessorUtils.getHtml(fixURL(IMDBUrl));
+
         try
         {
             obj = (JSONObject) parser.parse(tmp);
-
         }
         catch(Exception e)
         {

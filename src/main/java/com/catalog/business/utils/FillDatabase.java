@@ -198,7 +198,7 @@ public class FillDatabase
     	boolean result=false;
     	
     	  Iterator it=existingRecordsList.iterator();
-    	  System.out.println("Checking for "+f.getName());
+    	  //System.out.println("Checking for "+f.getName());
 		  while(it.hasNext())
 		  {
 			  Object[] array=(Object[]) it.next();
@@ -206,7 +206,7 @@ public class FillDatabase
 			  if(/*array[1].toString().contains(f.getName()) ||*/ array[0].toString().toLowerCase().equals(f.getAbsolutePath().toLowerCase()))
 	          {
 				  	//System.out.println("name: "+array[1]+"\n location:"+array[0]);
-				  System.out.println("Found in database, moving on...\n\n");
+				  //System.out.println("Found in database, moving on...\n\n");
 	        		result=true;
 	        		break;
 	          }

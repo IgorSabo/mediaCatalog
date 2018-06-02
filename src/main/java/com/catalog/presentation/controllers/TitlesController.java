@@ -241,14 +241,7 @@ public class TitlesController {
 	public ModelAndView synchornizeTitles(HttpSession session)
 	{
 		//synchronizing titles
-		//napuni bazu sa novim imenima
-		/*fillDatabase.getNames();
-		List<RawNames> list = rawNamesService.findByLastAdded(1);
-		if(list.size()>0)
-		{*/
-			//createEntities.createTitlesAlt((ArrayList)list);
-			titleService.processNewTitles(session);
-		//}
+		titleService.processNewTitles(session);
 
 		//removing status from session
 		session.removeAttribute("status");

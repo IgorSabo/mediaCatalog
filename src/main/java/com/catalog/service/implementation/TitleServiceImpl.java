@@ -108,7 +108,7 @@ public class TitleServiceImpl implements TitleService {
 		boolean executeSynchronization = false;
 		ScheduledJob activeJob = scheduledJobService.findLastScheduledJob(JobType.SYNCHRONIZATION_JOB);
 
-
+		SystemProcess syncProcess = null;
 
 		//determine if synchronization job is in progress
 		if( activeJob == null || activeJob.getEndTime() != null ){
@@ -122,8 +122,10 @@ public class TitleServiceImpl implements TitleService {
 		//start synchronization only if no active SYNCHRONIZATION_JOB job is found or running
 		if( executeSynchronization && list.size() > 0  ){
 
-			//create new record in system process table for synchronization process
-			SystemProcess syncProcess = systemProcessService.saveSystemProcess(ProcessType.SYNCHRONIZATION_PROCESS);
+			if(session != null){
+				//create new record in system process table for synchronization process
+				syncProcess = systemProcessService.saveSystemProcess(ProcessType.SYNCHRONIZATION_PROCESS);
+			}
 
 			double progressIncrement = list.size()/100;
 
@@ -206,10 +208,13 @@ public class TitleServiceImpl implements TitleService {
 
 			executor.shutdown();
 
-			//updating synchronization system process table
-			syncProcess.setEndTime(new Date());
-			syncProcess.setProcessStatus(ProcessStatus.SUCCESS);
-			systemProcessService.saveSystemProcess(syncProcess);
+			if(session != null){
+				//updating synchronization system process table
+				syncProcess.setEndTime(new Date());
+				syncProcess.setProcessStatus(ProcessStatus.FINISHED);
+				systemProcessService.saveSystemProcess(syncProcess);
+			}
+
 
 			//updating count tables
 			System.out.println("Updating count tables");

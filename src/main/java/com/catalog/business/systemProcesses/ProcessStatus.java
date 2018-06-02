@@ -6,7 +6,7 @@ package com.catalog.business.systemProcesses;
 public enum ProcessStatus {
 
     RUNNING("RUNNING"),
-    SUCCESS("SUCCESS"),
+    FINISHED("FINISHED"),
     FAIL("FAIL");
 
     private String name;

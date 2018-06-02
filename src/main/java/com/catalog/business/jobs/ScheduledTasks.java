@@ -1,7 +1,11 @@
 package com.catalog.business.jobs;
+import com.catalog.business.systemProcesses.ProcessStatus;
+import com.catalog.business.systemProcesses.ProcessType;
 import com.catalog.business.utils.CntTablesManipulator;
 import com.catalog.model.entities.ScheduledJob;
+import com.catalog.model.entities.SystemProcess;
 import com.catalog.service.ScheduledJobService;
+import com.catalog.service.SystemProcessService;
 import com.catalog.service.TitleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +32,9 @@ public class ScheduledTasks {
     @Autowired
     private CntTablesManipulator cntTablesManipulator;
 
+    @Autowired
+    private SystemProcessService systemProcessService;
+
     @Scheduled(cron = "0 */5 * ? * *")
     public void scheduleTaskWithCronExpression() {
         System.out.println(MessageFormat.format("Cron Task :: Execution Time - {0}", dateTimeFormatter.format(LocalDateTime.now())));
@@ -38,7 +45,15 @@ public class ScheduledTasks {
 
         Number oldCount = titleService.getTotalEntities();
 
-        titleService.processNewTitles(null);
+        SystemProcess process = systemProcessService.findFirstByProcessTypeOrderByStartTimeDesc(ProcessType.SYNCHRONIZATION_PROCESS);
+
+        //if synchronization is running in the background, skip this job
+        if( process == null || process.getProcessStatus().equals(ProcessStatus.FINISHED) ){
+            titleService.processNewTitles(null);
+            job.setJobStatus(JobStatus.FINISHED);
+        }else{
+            job.setJobStatus(JobStatus.SKIPPED);
+        }
 
         //set job end time
         job.setEndTime(new Date());
@@ -52,7 +67,7 @@ public class ScheduledTasks {
         System.out.println("Updating count tables");
         cntTablesManipulator.updateCountTables();
 
-        System.out.println("Synchronization completed!");
+        System.out.println("Synchronization job completed!");
         scheduledJobService.saveScheduledJob(job);
     }
 }
